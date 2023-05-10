@@ -1,9 +1,9 @@
 #include <stdio.h>
 
-typedef unsigned char uint8_t;
+#define uint8_t unsigned char
 
 void byteToHex(uint8_t byte, char* result) {
-	const char const alpha[] = "0123456789ABCDEF";
+	char const alpha[] = "0123456789ABCDEF";
 	result[1] = alpha[byte%16];
 	result[0] = alpha[(byte>>4)%16];
 	return;
@@ -28,3 +28,5 @@ int main(void) {
 	printf("%ud in HEX: %s\n", num, res);
 	return 0;
 }
+
+#undef uint8_t
