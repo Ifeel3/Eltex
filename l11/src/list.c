@@ -3,97 +3,93 @@
 
 #define uint32_t unsigned int
 
-list_t* createList(char* fistName, char* secondName, int number) {
-    list_t* newList = (list_t*)malloc(sizeof(list_t));
-    newList->m_firstName = (char*)malloc(sizeof(char)*(strlen(fistName)+1));
-    memset(newList->m_firstName, 0, strlen(fistName) + 1);
-    memcpy(newList->m_firstName, fistName, strlen(fistName));
-    newList->m_secondName = (char*)malloc(sizeof(char)*(strlen(secondName)+1));
-    memset(newList->m_secondName, 0, strlen(secondName) + 1);
-    memcpy(newList->m_secondName, secondName, strlen(secondName));
-    newList->m_number = number;
-    newList->m_next = NULL;
-    return newList;
+char* createStr(char* str) {
+    size_t len;
+    char* result;
+
+    len = strlen(str);
+    result = (char*)malloc(len + 1);
+    if (result == NULL)
+        return NULL;
+    memset(result, 0, len + 1);
+    memcpy(result, str, len);
+    return result;
+}
+
+list_t* createList(char* firstName, char* secondName, int number) {
+    list_t* result;
+
+    result = (list_t*)malloc(sizeof(list_t));
+    if (result == NULL)
+        return NULL;
+    result->m_firstName = createStr(firstName);
+    result->m_secondName = createStr(secondName);
+    if (result->m_firstName == NULL || result->m_secondName == NULL) {
+        if (result->m_firstName != NULL) free(result->m_firstName);
+        if (result->m_secondName != NULL) free(result->m_secondName);
+        free(result);
+        return NULL;
+    }
+    result->m_number = number;
+    result->m_next = NULL;
+    return result;
 }
 
 void deleteList(list_t* src) {
-    free(src->m_firstName);
-    free(src->m_secondName);
+    if (src->m_firstName != NULL) free(src->m_firstName);
+    if (src->m_secondName != NULL) free(src->m_secondName);
     free(src);
 }
 
-list_t* delete(list_t** head, list_t* src) {
-    if (src == (*head)) {
-        deleteList(*head);
-        (*head) = src;
-    } else {
-        list_t* tmp = (*head);
-        while(tmp != NULL && tmp->m_next != src) {
-            tmp = tmp->m_next;
-        }
-        if (tmp->m_next == src) {
-            list_t* next = tmp->m_next->m_next;
-            deleteList(tmp->m_next);
-            tmp->m_next = next;
-        }
-    }
-    return NULL;
-}
+list_t* deleteAll(list_t** head, list_t* unused) {
+    (void) unused;
+    list_t *current, *next;
 
-list_t* addToEnd(list_t** head, list_t* src) {
-    if ((*head) == NULL) {
-        (*head) = src;
-        return NULL;
-    }
-    list_t* tmp = (*head);
-    while(tmp != NULL && tmp->m_next != NULL) {
-        tmp = tmp->m_next;
-    }
-    tmp->m_next = src;
-    return NULL;
-}
-
-list_t* find(list_t** head, list_t* src) {
-    (void) head;
-    (void) src;
-    return NULL;
-}
-
-void deleteAllLists(list_t** head) {
-    list_t* current = (*head);
-    list_t* next = NULL;
+    current = (*head);
+    next = NULL;
     while(current != NULL) {
         next = current->m_next;
         deleteList(current);
         current = next;
         next = NULL;
     }
-    (*head) = NULL;
+    return NULL;
 }
 
-list_t* findByIndex(list_t** head, unsigned int num) {
-    if (num == 0) return (*head);
-    else {
-        list_t* tmp = (*head);
-        while(num > 0 && tmp != NULL) {
+list_t* addToEnd(list_t** head, list_t* src) {
+    list_t* tmp;
+    
+    if ((*head) == NULL) {
+        (*head) = src;
+        return NULL;
+    } else {
+        tmp = (*head);
+        while(tmp->m_next != NULL) {
             tmp = tmp->m_next;
-            --num;
         }
-        return tmp;
+        tmp->m_next = src;
+        return NULL;
     }
 }
 
-void printOne(list_t* src) {
+list_t* print(list_t** unused, list_t* src) {
+    (void) unused;
     printf("%s %s %d\n", src->m_firstName, src->m_secondName, src->m_number);
+    return NULL;
 }
 
 list_t* printAll(list_t** head, list_t* unused) {
     (void) unused;
-    list_t* tmp = (*head);
-    for(int i = 0; tmp != NULL; ++i) {
-        printf("%d.", i);
-        printOne(tmp);
+    list_t* tmp;
+    uint32_t counter;
+
+    tmp = (*head);
+    counter = 1;
+    while(tmp != NULL) {
+        printf("%d.", counter);
+        print(NULL, tmp);
         tmp = tmp->m_next;
+        ++counter;
     }
     return NULL;
 }
